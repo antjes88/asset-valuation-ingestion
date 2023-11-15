@@ -10,13 +10,13 @@ def test_asset_valuation_to_dict():
     """
     date = dt.date(2023, 1, 1)
     value = 100.0
-    product_name = 'product 1'
+    product_name = "product 1"
     creation_date = dt.datetime.now()
     asset_valuation = model.AssetValuation(date, value, product_name, creation_date)
 
     assert asset_valuation.to_dict() == {
-        'date': date.strftime("%Y-%m-%d"),
-        'value': value,
-        'product_name': product_name,
-        "creation_date": creation_date.strftime("%Y-%m-%d %H:%M:%S")
+        "date": date.strftime("%Y-%m-%d"),
+        "value": value,
+        "product_name": product_name,
+        "creation_date": creation_date.strftime("%Y-%m-%d %H:%M:%S"),
     }

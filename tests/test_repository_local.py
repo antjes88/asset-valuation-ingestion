@@ -50,11 +50,11 @@ def test_open():
     WHEN _open() method is called
     THEN it should return class to extract content of file
     """
-    file = repository.LocalFile('tests/data/dummy.txt')
+    file = repository.LocalFile("tests/data/dummy.txt")
     with file._open() as f:
         content = f.read()
 
-    assert content == 'Dummy'
+    assert content == "Dummy"
 
 
 def test_get_asset_valuations_from_generic_source():
@@ -63,7 +63,7 @@ def test_get_asset_valuations_from_generic_source():
     WHEN we call get_asset_valuations()
     THEN it should return a list of asset valuations with the expected values
     """
-    file = repository.LocalFile('tests/data/generic_2018_12_29.csv')
+    file = repository.LocalFile("tests/data/generic_2018_12_29.csv")
     asset_valuations = file.get_asset_valuations()
 
     assert len(asset_valuations) == len(ASSET_VALUATIONS)

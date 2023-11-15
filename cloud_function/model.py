@@ -17,6 +17,7 @@ class AssetValuation:
         to_dict() -> dict:
             Converts the instance data to a dictionary.
     """
+
     date: dt.date
     value: float
     product_name: str

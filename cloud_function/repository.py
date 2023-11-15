@@ -25,10 +25,11 @@ class FileAbstract(ABC):
             Retrieves asset valuations from the file. Implemented by calling internal methods
             based on the file type.
     """
+
     def __init__(self, file_path: str):
         self.file_path = file_path
-        self.file_format = file_path.split('.')[-1]
-        self.file_type = file_path.split('/')[-1].split('_')[0].lower()
+        self.file_format = file_path.split(".")[-1]
+        self.file_type = file_path.split("/")[-1].split("_")[0].lower()
 
     @abstractmethod
     def _open(self) -> IO:
@@ -59,11 +60,15 @@ class FileAbstract(ABC):
                     # todo: include check to columns
                 else:
                     dictify_row = dict(zip(column_names, row))
-                    asset_valuations.append(model.AssetValuation(
-                        dt.datetime.strptime(dictify_row['date'], '%Y-%m-%d').date(),
-                        float(dictify_row['value']),
-                        dictify_row['product_name']
-                    ))
+                    asset_valuations.append(
+                        model.AssetValuation(
+                            dt.datetime.strptime(
+                                dictify_row["date"], "%Y-%m-%d"
+                            ).date(),
+                            float(dictify_row["value"]),
+                            dictify_row["product_name"],
+                        )
+                    )
 
         return asset_valuations
 
@@ -78,7 +83,7 @@ class FileAbstract(ABC):
         Raises:
             Exception: Raised if the file type is not recognized.
         """
-        if self.file_type == 'generic':
+        if self.file_type == "generic":
             return self._get_asset_valuations_from_generic_source()
         else:
             raise Exception()  # todo: create error specific for table not set
@@ -104,6 +109,7 @@ class LocalFile(FileAbstract):
             Retrieves asset valuations from the file. Implemented by calling internal methods
             based on the file type.
     """
+
     def _open(self) -> IO:
         """
         Opens the local file and returns a file object.
@@ -141,6 +147,7 @@ class GcpBucketFile(FileAbstract):
         _get_bucket() -> storage.bucket.Bucket:
             Retrieves the GCP bucket.
     """
+
     def __init__(self, file_path: str, bucket_name: str, project_name: str = None):
         super().__init__(file_path)
         self.bucket_name = bucket_name
