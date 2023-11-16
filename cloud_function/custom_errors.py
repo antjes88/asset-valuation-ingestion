@@ -7,8 +7,11 @@ class FileTypeNotImplementedError(Exception):
     Attributes:
         message (str): message to be print on error.
     """
+
     def __init__(self, file_path: str):
-        self.message = f"FileTypeNotImplementedError. File: '{file_path}' has no extraction method"
+        self.message = (
+            f"FileTypeNotImplementedError. File: '{file_path}' has no extraction method"
+        )
 
     def __str__(self):
         return self.message
@@ -25,9 +28,12 @@ class FileFormatError(Exception):
     Attributes:
         message (str): message to be print on error.
     """
+
     def __init__(self, file_path: str, file_format: str, expected_file_format: str):
-        self.message = (f"FileFormatError. Expected '{expected_file_format}', received '{file_format}'. "
-                        f" File: '{file_path}' cannot be processed.")
+        self.message = (
+            f"FileFormatError. Expected '{expected_file_format}', received '{file_format}'. "
+            f" File: '{file_path}' cannot be processed."
+        )
 
     def __str__(self):
         return self.message
@@ -44,9 +50,12 @@ class HeaderNotMatchError(Exception):
     Attributes:
         message (str): message to be print on error.
     """
+
     def __init__(self, file_path: str, headers: str, expected_headers: str):
-        self.message = (f"HeaderNotMatchError. Expected '{expected_headers}', received '{headers}'. "
-                        f" File: '{file_path}' cannot be processed.")
+        self.message = (
+            f"HeaderNotMatchError. Expected '{expected_headers}', received '{headers}'. "
+            f" File: '{file_path}' cannot be processed."
+        )
 
     def __str__(self):
         return self.message

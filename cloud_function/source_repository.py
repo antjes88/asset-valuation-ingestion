@@ -53,8 +53,8 @@ class FileAbstract(ABC):
             custom_errors.FileFormatError: Raised if the format of the file is not a csv
             custom_errors.HeaderNotMatchError: Raised if file headers are not ["date", "product_name", "value"]
         """
-        if self.file_format != 'csv':
-            raise custom_errors.FileFormatError(self.file_path, self.file_format, 'csv')
+        if self.file_format != "csv":
+            raise custom_errors.FileFormatError(self.file_path, self.file_format, "csv")
 
         asset_valuations = []
         with self._open() as f:
@@ -68,7 +68,7 @@ class FileAbstract(ABC):
                         raise custom_errors.HeaderNotMatchError(
                             self.file_path,
                             str(column_names).replace("'", ""),
-                            "[date, product_name, value]"
+                            "[date, product_name, value]",
                         )
 
                 else:
@@ -124,12 +124,12 @@ class LocalFile(FileAbstract):
 
     def _open(self) -> IO:
         """
-        Opens the local file and returns a file object.
+        Opens the local file and returns a file object. It uses latin1 encoding.
 
         Returns:
             IO: An open file object.
         """
-        return open(self.file_path)
+        return open(self.file_path, encoding="utf-8")
 
 
 class GcpBucketFile(FileAbstract):
@@ -180,11 +180,11 @@ class GcpBucketFile(FileAbstract):
 
     def _open(self) -> IO:
         """
-        Opens the file in the GCP bucket and returns a file-like object.
+        Opens the file in the GCP bucket and returns a file-like object. It uses latin1 encoding.
 
         Returns:
             IO: An open file-like object.
         """
         blob = self.bucket.blob(self.file_path)
 
-        return blob.open()
+        return blob.open(encoding="utf-8")

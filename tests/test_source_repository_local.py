@@ -1,7 +1,7 @@
 import source_repository
 import custom_errors
 import pytest
-from tests.data.asset_valuations import ASSET_VALUATIONS
+from tests.data.asset_valuations import ASSET_VALUATIONS_2018
 
 
 @pytest.mark.parametrize(
@@ -67,8 +67,8 @@ def test_get_asset_valuations_from_generic_source():
     file = source_repository.LocalFile("tests/data/generic_2018_12_29.csv")
     asset_valuations = file.get_asset_valuations()
 
-    assert len(asset_valuations) == len(ASSET_VALUATIONS)
-    for expected_asset_valuation in ASSET_VALUATIONS:
+    assert len(asset_valuations) == len(ASSET_VALUATIONS_2018)
+    for expected_asset_valuation in ASSET_VALUATIONS_2018:
         assert expected_asset_valuation in asset_valuations
 
 
@@ -78,7 +78,9 @@ def test_error_file_type_no_implemented():
     WHEN we call get_asset_valuations()
     THEN FileTypeNotImplementedError has to be raised
     """
-    file = source_repository.LocalFile("tests/data/errors_check/noImplemented_2018_12_29.csv")
+    file = source_repository.LocalFile(
+        "tests/data/errors_check/noImplemented_2018_12_29.csv"
+    )
     with pytest.raises(custom_errors.FileTypeNotImplementedError):
         file.get_asset_valuations()
 
@@ -89,7 +91,9 @@ def test_file_format_error_generic_file():
     WHEN we call get_asset_valuations()
     THEN FileFormatError has to be raised
     """
-    file = source_repository.LocalFile("tests/data/errors_check/generic_2018_12_29.json")
+    file = source_repository.LocalFile(
+        "tests/data/errors_check/generic_2018_12_29.json"
+    )
     with pytest.raises(custom_errors.FileFormatError):
         file.get_asset_valuations()
 
