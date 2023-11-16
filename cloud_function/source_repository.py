@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from google.cloud import storage
 import model
+import custom_errors
 import csv
 import datetime as dt
 from typing import IO
@@ -40,7 +41,7 @@ class FileAbstract(ABC):
 
     def _get_asset_valuations_from_generic_source(self) -> list[model.AssetValuation]:
         """
-        Internal method to parse asset valuations from a generic source file.
+        Internal method to parse asset valuations from a generic source file. It checks for file format and headers.
         Generic source file must be a CSV and must contain at least columns:
             date: must follow next pattern 'YYYY-MM-DD'
             value: numerical valuation of asset
@@ -48,16 +49,28 @@ class FileAbstract(ABC):
 
         Returns:
             List[model.AssetValuation]: A list of AssetValuation instances.
+        Raises:
+            custom_errors.FileFormatError: Raised if the format of the file is not a csv
+            custom_errors.HeaderNotMatchError: Raised if file headers are not ["date", "product_name", "value"]
         """
-        # todo: include check for file format
+        if self.file_format != 'csv':
+            raise custom_errors.FileFormatError(self.file_path, self.file_format, 'csv')
+
         asset_valuations = []
         with self._open() as f:
             s_reader = csv.reader(f)
 
             for row_number, row in enumerate(s_reader):
                 if row_number == 0:
-                    column_names = row
-                    # todo: include check to columns
+                    column_names = [str(elem).lower() for elem in row]
+
+                    if sorted(column_names) != ["date", "product_name", "value"]:
+                        raise custom_errors.HeaderNotMatchError(
+                            self.file_path,
+                            str(column_names).replace("'", ""),
+                            "[date, product_name, value]"
+                        )
+
                 else:
                     dictify_row = dict(zip(column_names, row))
                     asset_valuations.append(
@@ -79,14 +92,13 @@ class FileAbstract(ABC):
 
         Returns:
             List[model.AssetValuation]: A list of AssetValuation instances.
-
         Raises:
-            Exception: Raised if the file type is not recognized.
+            custom_errors.FileTypeNotImplementedError: Raised if the file type is not recognized.
         """
         if self.file_type == "generic":
             return self._get_asset_valuations_from_generic_source()
         else:
-            raise Exception()  # todo: create error specific for table not set
+            raise custom_errors.FileTypeNotImplementedError(self.file_path)
 
 
 class LocalFile(FileAbstract):

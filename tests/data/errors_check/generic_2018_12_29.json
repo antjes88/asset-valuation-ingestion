@@ -1,0 +1,12 @@
+[
+  {
+    "product_name":  "product 1",
+    "date": "2020-01-01",
+    "value": 1200.0
+  },
+  {
+    "product_name":  "product 2",
+    "date": "2020-01-01",
+    "value": 31200.0
+  }
+]
