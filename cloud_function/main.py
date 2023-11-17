@@ -24,8 +24,8 @@ def function_entry_point(event, context):
     """
     # todo: add logging
     bucket_name = event["bucket"]
-    print(bucket_name)
     file_path = event["name"]
+    print(file_path)
     file = source_repository.GcpBucketFile(file_path, bucket_name)
     bigquery = destination_repository.BiqQueryRepository()
 

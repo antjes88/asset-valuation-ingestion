@@ -1,0 +1,35 @@
+name: Pytest
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10']
+      max-parallel: 1
+    env: # Or as an environment variable
+      PROJECT: ${{ secrets.PROJECT }}
+      DESTINATION_TABLE: ${{ secrets.DESTINATION_TABLE }}
+      DATASET: ${{ secrets.DATASET }}
+      SA_JSON: ${{ secrets.SA_JSON }}
+      SOURCE_BUCKET: ${{ secrets.SOURCE_BUCKET }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f cloud_function/requirements.txt ]; then pip install -r cloud_function/requirements.txt; fi
+          python -m pip install pytest==7.4.3
+          python -m pip install python-dotenv==0.14.0
+      - name: Test with pytest
+        run: |
+          python -m pytest -vv
