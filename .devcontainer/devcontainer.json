@@ -1,0 +1,25 @@
+{
+    "name": "csv-ingestion",
+    "build": {
+        "context": "..",
+        "dockerfile": "./Dockerfile",
+        "target": "devcontainer"
+    },
+    "remoteEnv": {
+        "PYTHONPATH": "/workspaces/csv-ingestion/src/entrypoints:${containerEnv:PYTHONPATH}",
+        "PATH": "/usr/app/google-cloud-sdk/bin:/workspaces/csv-ingestion/cli/bin:${containerEnv:PATH}"
+    },
+    "postCreateCommand": "/usr/app/post_create_commands.sh",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.black-formatter",
+                "ms-azuretools.vscode-docker",
+                "gruntfuggly.todo-tree",
+                "redhat.vscode-yaml",
+                "mechatroner.rainbow-csv"
+            ]
+        }
+    }
+}

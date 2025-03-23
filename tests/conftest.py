@@ -1,14 +1,18 @@
 from google.cloud import storage
+from google.cloud.storage.bucket import Bucket
 import pytest
 import os
-import destination_repository
+from typing import Tuple, List, Generator, Optional
+
+from src import destination_repository, model
 from tests.data.asset_valuations import ASSET_VALUATIONS_2018
 
 
 @pytest.fixture(scope="session")
-def bq_repository():
+def bq_repository() -> destination_repository.BiqQueryRepository:
     """
-    Fixture that returns instance of BiqQueryRepository() instantiated with test parameters
+    Fixture that returns instance of BiqQuery Repository interface
+    instantiated with test parameters.
 
     Returns:
         instance of BiqQueryRepository()
@@ -24,14 +28,19 @@ def bq_repository():
 
 
 @pytest.fixture(scope="function")
-def repository_with_asset_valuations(bq_repository):
+def repository_with_asset_valuations(
+    bq_repository: destination_repository.BiqQueryRepository,
+) -> Generator[
+    Tuple[destination_repository.BiqQueryRepository, List[model.AssetValuation]],
+    None,
+    None,
+]:
     """
-    Fixture that creates an asset valuation table and loads some dummy table on it on destination BigQuery project.
-    Deletes table during tear down.
+    Fixture that creates an asset valuation table and loads some dummy table on
+    it on destination BigQuery project. Asset valuation table is deleted on tear down.
 
     Args:
         bq_repository: instance of BiqQueryRepository()
-
     Returns:
         instance of BiqQueryRepository() where an asset valuation table has been created
     """
@@ -45,7 +54,11 @@ def repository_with_asset_valuations(bq_repository):
 
 
 @pytest.fixture(scope="function")
-def empty_bucket_and_project():
+def empty_bucket_and_project() -> Generator[
+    Tuple[Bucket, Optional[str]],
+    None,
+    None,
+]:
     """
     Fixture for setting up and tearing down a clean state for a testing GCP bucket.
 
@@ -54,16 +67,19 @@ def empty_bucket_and_project():
     and finally cleans up by deleting all blobs in the source bucket after the test.
 
     Yields:
-        Tuple[storage.bucket.Bucket, str]: A tuple containing the GCP bucket and project name where the bucket is
-                                           allocated.
+        Tuple[Bucket, Optional[str]]: A tuple containing the GCP bucket and project name where the bucket is
+                                      allocated.
     """
-    storage_client = storage.Client(os.environ["PROJECT"])
-    bucket = storage_client.bucket(os.environ["SOURCE_BUCKET"])
 
-    for blob in bucket.list_blobs():
-        blob.delete()
+    def delete_blobs(bucket: Bucket) -> None:
+        for blob in bucket.list_blobs():
+            blob.delete()
+
+    storage_client = storage.Client(os.environ["PROJECT"])
+    bucket: Bucket = storage_client.bucket(os.environ["SOURCE_BUCKET"])
+
+    delete_blobs(bucket)
 
     yield bucket, storage_client.project
 
-    for blob in bucket.list_blobs():
-        blob.delete()
+    delete_blobs(bucket)

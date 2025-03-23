@@ -1,6 +1,6 @@
-import source_repository
-import custom_errors
 import pytest
+
+from src import source_repository, custom_errors
 from tests.data.asset_valuations import ASSET_VALUATIONS_2018
 
 
@@ -94,6 +94,17 @@ def test_file_format_error_generic_file():
     file = source_repository.LocalFile(
         "tests/data/errors_check/generic_2018_12_29.json"
     )
+    with pytest.raises(custom_errors.FileFormatError):
+        file.get_asset_valuations()
+
+
+def test_file_format_error_hl_file():
+    """
+    GIVEN a HL file which format is not csv
+    WHEN we call get_asset_valuations()
+    THEN FileFormatError has to be raised
+    """
+    file = source_repository.LocalFile("tests/data/errors_check/hl_2018_12_29.json")
     with pytest.raises(custom_errors.FileFormatError):
         file.get_asset_valuations()
 

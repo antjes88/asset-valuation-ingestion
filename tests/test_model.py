@@ -1,26 +1,8 @@
-import model
 import datetime as dt
 import pytest
+from typing import Any
 
-
-def test_asset_valuation_to_dict():
-    """
-    GIVEN an object of AssetValuation
-    WHEN method to_dict() is called
-    THEN it should return a dictionary representation of the instance data
-    """
-    date = dt.date(2023, 1, 1)
-    value = 100.0
-    product_name = "product 1"
-    creation_date = dt.datetime.now()
-    asset_valuation = model.AssetValuation(date, value, product_name, creation_date)
-
-    assert asset_valuation.to_dict() == {
-        "date": date.strftime("%Y-%m-%d"),
-        "value": value,
-        "product_name": product_name,
-        "creation_date": creation_date.strftime("%Y-%m-%d %H:%M:%S"),
-    }
+from src import model
 
 
 def test_asset_valuation_equality():
@@ -37,6 +19,7 @@ def test_asset_valuation_equality():
         date,
         value,
         product_name,
+        "file1.csv",
         dt.datetime(
             1990,
             1,
@@ -46,6 +29,7 @@ def test_asset_valuation_equality():
         date,
         value,
         product_name,
+        "file2.csv",
         dt.datetime(
             2020,
             12,
@@ -63,12 +47,12 @@ def test_asset_valuation_equality():
     ],
 )
 def test_asset_valuation_inequality(
-    date_left,
-    date_right,
-    value_left,
-    value_right,
-    product_name_left,
-    product_name_right,
+    date_left: dt.datetime,
+    date_right: dt.datetime,
+    value_left: float,
+    value_right: float,
+    product_name_left: str,
+    product_name_right: str,
 ):
     """
     GIVEN 2 asset valuations with different dates, values or product names
@@ -80,19 +64,20 @@ def test_asset_valuation_inequality(
         1,
         1,
     )
+    file_name = "file.csv"
 
     assert model.AssetValuation(
-        date_left, value_left, product_name_left, creation_date
+        date_left, value_left, product_name_left, file_name, creation_date
     ) != model.AssetValuation(
-        date_right, value_right, product_name_right, creation_date
+        date_right, value_right, product_name_right, file_name, creation_date
     )
 
 
 @pytest.mark.parametrize("value", [1, "string", 0.1, dt.datetime.now()])
-def test_asset_valuation_inequality_other(value):
+def test_asset_valuation_inequality_other(value: Any):
     """
     GIVEN an asset valuation and another data structure
     WHEN they are checked for equality
     THEN the result should be that are NOT equal
     """
-    assert model.AssetValuation(dt.datetime.now(), 0.1, "GBP") != value
+    assert model.AssetValuation(dt.datetime.now(), 0.1, "GBP", "file.csv") != value

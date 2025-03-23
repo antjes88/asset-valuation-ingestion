@@ -1,9 +1,9 @@
 import os
 from dotenv import load_dotenv
-import sys
+from typing import Optional
 
 
-def env_var_loader(file_name, file_path=None):
+def env_var_loader(file_name: str, file_path: Optional[str] = None):
     """
     Load environment variables from a specified file using python-dotenv.
 
@@ -21,15 +21,12 @@ def env_var_loader(file_name, file_path=None):
         load_dotenv(dotenv_path=env_path)
 
 
-# load env vars
+# load tests env vars
 env_var_loader("tests/.env")
-
-# load path to get python files
-sys.path.append(os.path.join(os.getcwd(), "cloud_function"))
 
 # load sa if applicable
 if os.environ.get("SA_JSON"):
     name = "sa.json"
     with open(name, "w") as f:
-        f.write(os.environ.get("SA_JSON"))
+        f.write(os.environ.get("SA_JSON", ""))
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = name
