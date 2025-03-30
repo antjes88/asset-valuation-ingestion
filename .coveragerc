@@ -1,5 +1,7 @@
 [run]
-omit = tests/*
+omit = 
+    tests/*
+    src/entrypoints/*
 
 [report]
 exclude_lines =
