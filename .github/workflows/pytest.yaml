@@ -1,0 +1,52 @@
+name: Pytest
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10"]
+      max-parallel: 1
+    env:
+      PROJECT: ${{ secrets.PROJECT }}
+      DESTINATION_TABLE: ${{ secrets.DESTINATION_TABLE }}
+      DATASET: ${{ secrets.DATASET }}
+      SA_JSON: ${{ secrets.SA_JSON }}
+      SOURCE_BUCKET: ${{ secrets.SOURCE_BUCKET }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f .devcontainer/dev-requirements.txt ]; then pip install -r .devcontainer/dev-requirements.txt; fi
+
+      - name: Test with pytest
+        run: |
+          python -m pytest -vv
+
+      - name: Build converage file
+        run: |
+          python -m pytest --junitxml=pytest.xml --cov-report "xml:coverage.xml" --cov=src tests/
+
+      - name: Post comment
+        uses: Mishakav/pytest-coverage-comment@v1.1.53
+        with:
+          pytest-xml-coverage-path: coverage.xml
+          junitxml-path: ./pytest.xml
+          coverage-path-prefix: src/
