@@ -1,4 +1,4 @@
 project_id           = "poetic-dock-367718"
-service_account_name = "csv-ingestion-cloud-function"
-cloud_function_name  = "csv-ingestion"
-storage_bucket_name  = "assets-collection-raw"
+cloud_function_name  = "asset-valuation-ingestion"
+service_account_name = "asset-valuation-ingestion"
+function_entry_point = "function_entry_point"

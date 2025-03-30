@@ -7,7 +7,7 @@ from tests.data.asset_valuations import ASSET_VALUATIONS_2021, ASSET_VALUATIONS_
 
 def test_asset_valuation_pipeline_generic(
     repository_with_asset_valuations: Tuple[
-        destination_repository.BiqQueryRepository, List[model.AssetValuation]
+        destination_repository.BiqQueryDestinationRepository, List[model.AssetValuation]
     ],
 ):
     """
@@ -15,7 +15,7 @@ def test_asset_valuation_pipeline_generic(
     WHEN we call the service asset_valuation_pipeline()
     THEN the destination table must be updated with the new data
     """
-    file = source_repository.LocalFile("tests/data/generic_2021_01_01.csv")
+    file = source_repository.LocalFileSource("tests/data/generic_2021_01_01.csv")
     bq_repository, asset_valuations_pre = repository_with_asset_valuations
     services.asset_valuation_pipeline(file, bq_repository)
 
@@ -43,7 +43,7 @@ def test_asset_valuation_pipeline_generic(
 
 def test_asset_valuation_pipeline_hl(
     repository_with_asset_valuations: Tuple[
-        destination_repository.BiqQueryRepository, List[model.AssetValuation]
+        destination_repository.BiqQueryDestinationRepository, List[model.AssetValuation]
     ],
 ):
     """
@@ -51,7 +51,7 @@ def test_asset_valuation_pipeline_hl(
     WHEN we call the service asset_valuation_pipeline()
     THEN the destination table must be updated with the new data
     """
-    file = source_repository.LocalFile("tests/data/hl_2023_11_24.csv")
+    file = source_repository.LocalFileSource("tests/data/hl_2023_11_24.csv")
     bq_repository, asset_valuations_pre = repository_with_asset_valuations
     services.asset_valuation_pipeline(file, bq_repository)
 

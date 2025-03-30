@@ -7,7 +7,7 @@ from src import model, destination_repository
 
 def test_load_asset_valuations_from_zero(
     repository_with_asset_valuations: Tuple[
-        destination_repository.BiqQueryRepository, List[model.AssetValuation]
+        destination_repository.BiqQueryDestinationRepository, List[model.AssetValuation]
     ],
 ):
     """
@@ -39,7 +39,7 @@ def test_load_asset_valuations_from_zero(
 
 def test_load_asset_valuations_appending(
     repository_with_asset_valuations: Tuple[
-        destination_repository.BiqQueryRepository, List[model.AssetValuation]
+        destination_repository.BiqQueryDestinationRepository, List[model.AssetValuation]
     ],
 ):
     """

@@ -24,7 +24,7 @@ def test_file_format(file_path: str, file_format: str):
     WHEN an object of class file is created
     THEN the attribute file_format should return the format of the file
     """
-    file = source_repository.GcpBucketFile(
+    file = source_repository.GcpBucketFileSource(
         file_path, os.environ["SOURCE_BUCKET"], project_name=os.environ["PROJECT"]
     )
 
@@ -45,7 +45,7 @@ def test_file_type(file_path: str, file_type: str):
     WHEN an object of class file is created
     THEN the attribute file_type should return the type of the file
     """
-    file = source_repository.GcpBucketFile(
+    file = source_repository.GcpBucketFileSource(
         file_path, os.environ["SOURCE_BUCKET"], project_name=os.environ["PROJECT"]
     )
 
@@ -63,7 +63,7 @@ def test_open(empty_bucket_and_project: Tuple[Bucket, Optional[str]]):
     blob = bucket.blob(blob_name)
     blob.upload_from_filename("tests/data/dummy.txt")
 
-    file = source_repository.GcpBucketFile(
+    file = source_repository.GcpBucketFileSource(
         blob_name, bucket.name if bucket.name else "", project_name=project_name
     )
     with file._open() as f:
@@ -83,7 +83,7 @@ def test_get_asset_valuations_from_generic_source(empty_bucket_and_project):
     blob = bucket.blob(blob_name)
     blob.upload_from_filename("tests/data/generic_2018_12_29.csv")
 
-    file = source_repository.GcpBucketFile(
+    file = source_repository.GcpBucketFileSource(
         blob_name, bucket.name, project_name=project_name
     )
     asset_valuations = file.get_asset_valuations()
@@ -104,7 +104,7 @@ def test_error_file_type_no_implemented(empty_bucket_and_project):
     blob = bucket.blob(blob_name)
     blob.upload_from_filename("tests/data/errors_check/noImplemented_2018_12_29.csv")
 
-    file = source_repository.GcpBucketFile(
+    file = source_repository.GcpBucketFileSource(
         blob_name, bucket.name, project_name=project_name
     )
     with pytest.raises(custom_errors.FileTypeNotImplementedError):
@@ -122,7 +122,7 @@ def test_file_format_error_generic_file(empty_bucket_and_project):
     blob = bucket.blob(blob_name)
     blob.upload_from_filename("tests/data/errors_check/generic_2018_12_29.json")
 
-    file = source_repository.GcpBucketFile(
+    file = source_repository.GcpBucketFileSource(
         blob_name, bucket.name, project_name=project_name
     )
     with pytest.raises(custom_errors.FileFormatError):
@@ -140,7 +140,7 @@ def test_header_do_not_match_generic_file(empty_bucket_and_project):
     blob = bucket.blob(blob_name)
     blob.upload_from_filename("tests/data/errors_check/generic_2018_12_29.csv")
 
-    file = source_repository.GcpBucketFile(
+    file = source_repository.GcpBucketFileSource(
         blob_name, bucket.name, project_name=project_name
     )
     with pytest.raises(custom_errors.HeaderNotMatchError):

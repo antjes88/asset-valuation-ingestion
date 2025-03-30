@@ -1,0 +1,18 @@
+HL Stocks & Shares ISA, , , ,
+Client Name:,Mr Test User, , ,
+Client Number:, 1111111, , ,
+
+Stock value:,"28,912.95", , ,
+Total cash:,"2,200.00", , ,
+Amount available to invest:,"2,180.00", , ,
+Total value:,"31,112.95", , ,
+
+Code,Stock,Units held,Price (pence),Value (�),Cost (�),Gain/loss (�),Gain/loss (%),
+"BBBW","AXA Framlington Test 1","100.500","10,000.90","10,140.45","10,000.00","140.45","1.40"
+"BBBZ","Fidelity Asia Test 2","1,500.000","200.80","4,200.00","4,300.76","-100.76","-2.34"
+"GOO","Googles","14,500","100.50","14,572.50","10,000.00","4,572.50","45.72"
+"","Totals","","","28,912.95","24,300.76","-4,612.19","18.97"
+
+"Shares are valued at the bid-price, delayed by 15 minutes. Funds are valued at the most recent bid-price."
+
+"*2 This may not be the current price, but is the most recent we have available online. For further information, please view the factsheet or contact us."

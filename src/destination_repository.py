@@ -29,7 +29,7 @@ class AbstractDestinationRepository(ABC):
         raise NotImplementedError
 
 
-class BiqQueryRepository(AbstractDestinationRepository):
+class BiqQueryDestinationRepository(AbstractDestinationRepository):
     """
     Concrete implementation of the AbstractDestinationRepository for interacting with Google BigQuery.
     This repository class is designed to load asset valuations data into Google BigQuery.
@@ -53,8 +53,8 @@ class BiqQueryRepository(AbstractDestinationRepository):
         Load Asset Valuations into BigQuery table indicated by attribute asset_valuations_destination.
 
         Args:
-            asset_valuations (List[model.AssetValuation]): List of AssetValuation instances to be loaded
-                into BigQuery.
+            asset_valuations (List[model.AssetValuation]):
+                List of AssetValuation instances to be loaded into BigQuery.
         """
 
         dictify: List[Dict[str, Any]] = [

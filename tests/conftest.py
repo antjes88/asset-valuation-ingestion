@@ -9,7 +9,7 @@ from tests.data.asset_valuations import ASSET_VALUATIONS_2018
 
 
 @pytest.fixture(scope="session")
-def bq_repository() -> destination_repository.BiqQueryRepository:
+def bq_repository() -> destination_repository.BiqQueryDestinationRepository:
     """
     Fixture that returns instance of BiqQuery Repository interface
     instantiated with test parameters.
@@ -17,7 +17,7 @@ def bq_repository() -> destination_repository.BiqQueryRepository:
     Returns:
         instance of BiqQueryRepository()
     """
-    bq_repository = destination_repository.BiqQueryRepository(
+    bq_repository = destination_repository.BiqQueryDestinationRepository(
         project=os.environ["PROJECT"]
     )
     bq_repository.asset_valuations_destination = (
@@ -29,9 +29,11 @@ def bq_repository() -> destination_repository.BiqQueryRepository:
 
 @pytest.fixture(scope="function")
 def repository_with_asset_valuations(
-    bq_repository: destination_repository.BiqQueryRepository,
+    bq_repository: destination_repository.BiqQueryDestinationRepository,
 ) -> Generator[
-    Tuple[destination_repository.BiqQueryRepository, List[model.AssetValuation]],
+    Tuple[
+        destination_repository.BiqQueryDestinationRepository, List[model.AssetValuation]
+    ],
     None,
     None,
 ]:

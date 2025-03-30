@@ -1,4 +1,7 @@
 from src import source_repository, destination_repository, services
+from src.logs import default_module_logger
+
+logger = default_module_logger(__file__)
 
 
 def function_entry_point(event, context):
@@ -20,11 +23,10 @@ def function_entry_point(event, context):
     Returns:
         None
     """
-    # todo: add logging
     bucket_name = event["bucket"]
     file_path = event["name"]
-    print(file_path)
-    file = source_repository.GcpBucketFile(file_path, bucket_name)
-    bigquery = destination_repository.BiqQueryRepository()
+    logger.info(f"Working on file: '{file_path}' found on Bucket: '{bucket_name}'")
+    file = source_repository.GcpBucketFileSource(file_path, bucket_name)
+    bigquery = destination_repository.BiqQueryDestinationRepository()
 
     services.asset_valuation_pipeline(file, bigquery)

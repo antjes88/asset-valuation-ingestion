@@ -10,7 +10,7 @@ else
 fi
 ACTIVATE_SCRIPT="${REPO_ROOT}/venv/bin/activate"
 
-if [! -f "${ACTIVATE_SCRIPT}" ]; then
+if [ ! -f "${ACTIVATE_SCRIPT}" ]; then
     echo "Virtual environment not found. Did you run python_setup.sh?"
     exit 1
 fi

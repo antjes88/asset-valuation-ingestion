@@ -9,23 +9,23 @@ variable "region" {
   description = "Location for the resources"
 }
 
-variable "cloud_function_name" {
+variable "temp_folder_prefix" {
+  description = "Prefix for the temporary folder"
   type        = string
-  description = "Name of the CSV Ingestion Cloud Function"
+  default     = "temp-cloud-function"
 }
 
-variable "function_entry_point" {
+variable "cloud_function_name" {
   type        = string
-  default     = "function_entry_point"
-  description = "Name of the function entry point for the Python solution at main.py"
+  description = "Name of the Cloud Function"
 }
 
 variable "service_account_name" {
   type        = string
-  description = "Name of the Service Account"
+  description = "Name of the Cloud Function"
 }
 
-variable "storage_bucket_name" {
+variable "function_entry_point" {
   type        = string
-  description = "Name of the Trigger bucket name"
+  description = "Name of the Cloud Function"
 }

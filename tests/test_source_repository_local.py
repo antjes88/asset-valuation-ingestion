@@ -21,7 +21,7 @@ def test_file_format(file_path, file_format):
     WHEN an object of class file is created
     THEN the attribute file_format should return the format of the file
     """
-    file = source_repository.LocalFile(file_path)
+    file = source_repository.LocalFileSource(file_path)
 
     assert file.file_format == file_format
 
@@ -40,7 +40,7 @@ def test_file_type(file_path, file_type):
     WHEN an object of class file is created
     THEN the attribute file_type should return the type of the file
     """
-    file = source_repository.LocalFile(file_path)
+    file = source_repository.LocalFileSource(file_path)
 
     assert file.file_type == file_type
 
@@ -51,7 +51,7 @@ def test_open():
     WHEN _open() method is called
     THEN it should return class to extract content of file
     """
-    file = source_repository.LocalFile("tests/data/dummy.txt")
+    file = source_repository.LocalFileSource("tests/data/dummy.txt")
     with file._open() as f:
         content = f.read()
 
@@ -64,7 +64,7 @@ def test_get_asset_valuations_from_generic_source():
     WHEN we call get_asset_valuations()
     THEN it should return a list of asset valuations with the expected values
     """
-    file = source_repository.LocalFile("tests/data/generic_2018_12_29.csv")
+    file = source_repository.LocalFileSource("tests/data/generic_2018_12_29.csv")
     asset_valuations = file.get_asset_valuations()
 
     assert len(asset_valuations) == len(ASSET_VALUATIONS_2018)
@@ -78,7 +78,7 @@ def test_error_file_type_no_implemented():
     WHEN we call get_asset_valuations()
     THEN FileTypeNotImplementedError has to be raised
     """
-    file = source_repository.LocalFile(
+    file = source_repository.LocalFileSource(
         "tests/data/errors_check/noImplemented_2018_12_29.csv"
     )
     with pytest.raises(custom_errors.FileTypeNotImplementedError):
@@ -91,7 +91,7 @@ def test_file_format_error_generic_file():
     WHEN we call get_asset_valuations()
     THEN FileFormatError has to be raised
     """
-    file = source_repository.LocalFile(
+    file = source_repository.LocalFileSource(
         "tests/data/errors_check/generic_2018_12_29.json"
     )
     with pytest.raises(custom_errors.FileFormatError):
@@ -104,8 +104,23 @@ def test_file_format_error_hl_file():
     WHEN we call get_asset_valuations()
     THEN FileFormatError has to be raised
     """
-    file = source_repository.LocalFile("tests/data/errors_check/hl_2018_12_29.json")
+    file = source_repository.LocalFileSource(
+        "tests/data/errors_check/hl_2018_12_29.json"
+    )
     with pytest.raises(custom_errors.FileFormatError):
+        file.get_asset_valuations()
+
+
+def test_value_error_hl_file():
+    """
+    GIVEN a HL file which do not contain date
+    WHEN we call get_asset_valuations()
+    THEN ValueError has to be raised
+    """
+    file = source_repository.LocalFileSource(
+        "tests/data/errors_check/hl_2023_11_24_wrong.csv"
+    )
+    with pytest.raises(ValueError):
         file.get_asset_valuations()
 
 
@@ -115,6 +130,8 @@ def test_header_do_not_match_generic_file():
     WHEN we call get_asset_valuations()
     THEN HeaderNotMatchError has to be raised
     """
-    file = source_repository.LocalFile("tests/data/errors_check/generic_2018_12_29.csv")
+    file = source_repository.LocalFileSource(
+        "tests/data/errors_check/generic_2018_12_29.csv"
+    )
     with pytest.raises(custom_errors.HeaderNotMatchError):
         file.get_asset_valuations()

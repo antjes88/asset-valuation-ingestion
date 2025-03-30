@@ -29,7 +29,7 @@ class AbstractSourceRepository(ABC):
         raise NotImplementedError
 
 
-class FileAbstract(AbstractSourceRepository, ABC):
+class FileSourceAbstract(AbstractSourceRepository, ABC):
     """
     An abstract base class representing a generic file from which to retrieve asset valuations.
 
@@ -197,7 +197,7 @@ class FileAbstract(AbstractSourceRepository, ABC):
             raise custom_errors.FileTypeNotImplementedError(self.file_path)
 
 
-class LocalFile(FileAbstract):
+class LocalFileSource(FileSourceAbstract):
     """
     A concrete implementation of FileAbstract to work with local files.
     This class provides methods for opening and retrieving asset valuations from a local file.
@@ -230,7 +230,7 @@ class LocalFile(FileAbstract):
         return open(self.file_path, encoding="utf-8")
 
 
-class GcpBucketFile(FileAbstract):
+class GcpBucketFileSource(FileSourceAbstract):
     """
     A concrete implementation of FileAbstract to work with GCP Bucket Blob.
     This class provides methods for opening and retrieving asset valuations from a GCP Blob.
