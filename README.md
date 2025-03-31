@@ -5,7 +5,8 @@ This repository provides a solution for ingesting Asset Valuation data from file
 
 The solution is deployed using Terraform as a Google Cloud Function. This function is triggered whenever a file is uploaded to a specified GCP bucket. Upon activation, the function processes the CSV file and loads its data into BigQuery. See picture below.
 
-![solution_diagram](docs/images/solution-diagram.png)
+| ![solution_diagram](docs/images/solution-diagram.png)  |
+|:----------------------------:|
 
 ## Features
 
@@ -41,7 +42,7 @@ git config --global user.email "your github account email"
 
 ### Local Execution
 
-To execute the solution, use the following command in a Bash terminal `csv-ingestion` inside the devcontainer. Executing this command will prompt a message providing the available arguments to perform different actions. You can explore additional details and options by using the --help tag.
+To execute the solution, use the following command in a Bash terminal `asset-valuation-ingestion` inside the devcontainer. Executing this command will prompt a message providing the available arguments to perform different actions. You can explore additional details and options by using the --help tag.
 
 you need to provide a `.env` file at project root location with the following data:
 
@@ -72,7 +73,7 @@ Unit testing has been integrated into the CI/CD pipeline. A merge will not be ap
 
 The code architecture of the Python solution is illustrated below. We adopt Onion/Clean Architecture, so ensuring that our Business Logic (Domain Model) has no dependencies. Our goal is to follow SOLID principles, promoting seamless future changes and enhancing code clarity.
 
-The `src/entrypoints/cloud_function/main.py` file is used by the deployed solution as entrypoint, as required by GCP Cloud Functions. Locally, as described in the "Local Execution" section, code execution starts from the Python entrypoint located at `src/entrypoints/cli/__main__.py`. This entrypoint is invoked using the command `csv-ingestion` in a Bash terminal. 
+The `src/entrypoints/cloud_function/main.py` file is used by the deployed solution as entrypoint, as required by GCP Cloud Functions. Locally, as described in the "Local Execution" section, code execution starts from the Python entrypoint located at `src/entrypoints/cli/__main__.py`. This entrypoint is invoked using the command `asset-valuation-ingestion` in a Bash terminal. 
 
 Several entry points can be provided seamlessly because, following Clean Architecture principles, the `main.py` function is treated as the last detail. This ensures that none of the core solution code depends on the entry point; instead, the entry point depends on the core solution code. This design promotes flexibility and allows for the easy addition of new entry points without impacting the existing architecture. Which, in turn, means that the source is independent of the infrastructure. 
 
@@ -80,13 +81,15 @@ The Python entrypoint invokes one of the services found in `src/services.py`. In
 
 The services handle the execution by calling methods found in the Domain and Adapters to ensure the successful completion of the process.
 
-![components_diagram.png](docs/images/components-diagram.png)
+| ![components_diagram.png](docs/images/components-diagram.png) |
+|:----------------------------:|
 
 The clients for data storage have been implemented following the Repository pattern. This design pattern abstracts the logic for retrieving and storing data, providing a higher-level interface to the rest of the application. By doing so, it enables the implementation of the Dependency Inversion Principle (DIP). This approach allows our Database Layer (Adapters) to depend on the Domain Model, rather than the other way around. This, in turn, facilitates the seamless use of the same Business Logic/Domain Model in another scenario with a different Infrastructure/Data Layer.
 
 Related code can be found on `src/destination_repository.py` and `src/source_repository.py`.
 
-![adapters_diagram](docs/images/adapters-diagram.png)
+| ![adapters_diagram](docs/images/adapters-diagram.png) |
+|:----------------------------:|
 
 In the picture above you can also find the Domain Model diagram representing the code found in `src/model` folder. Circles are value objects and rectangles are entities.
 

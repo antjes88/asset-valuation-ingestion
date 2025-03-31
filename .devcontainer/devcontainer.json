@@ -1,13 +1,13 @@
 {
-    "name": "csv-ingestion",
+    "name": "asset-valuation-ingestion",
     "build": {
         "context": "..",
         "dockerfile": "./Dockerfile",
         "target": "devcontainer"
     },
     "remoteEnv": {
-        "PYTHONPATH": "/workspaces/csv-ingestion/src/entrypoints:${containerEnv:PYTHONPATH}",
-        "PATH": "/usr/app/google-cloud-sdk/bin:/workspaces/csv-ingestion/cli/bin:${containerEnv:PATH}",
+        "PYTHONPATH": "/workspaces/asset-valuation-ingestion/src/entrypoints:${containerEnv:PYTHONPATH}",
+        "PATH": "/usr/app/google-cloud-sdk/bin:/workspaces/asset-valuation-ingestion/cli/bin:${containerEnv:PATH}",
         "ISDEVCONTAINER": "true"
     },
     "postCreateCommand": "/usr/app/post_create_commands.sh",

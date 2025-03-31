@@ -1,4 +1,4 @@
-# !/bin/bash
+#!/bin/bash
 set -e
 
 GCLOUD_VERSION="453.0.0"
