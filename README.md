@@ -96,7 +96,7 @@ In the picture above you can also find the Domain Model diagram representing the
 ## CI/CD - Pipeline Integration
 There are 2 CI/CD pipelines implemented as GitHub Actions:
 
-1. **Pytest**: This pipeline is defined in the `.github/workflows/pytest.yaml` file. It is triggered on every pull request, what runs unit tests using `pytest`. It also generates a test coverage report to ensure code quality. If any test fails, the pipeline will block the merge process, ensuring that only reliable code is integrated into the main branch.
+1. **Pytest**: This pipeline is defined in the `.github/workflows/pytest.yaml` file. It is triggered on every pull request, what runs unit tests using `pytest`. It also generates a test coverage report to ensure code quality. If any test fails, the pipeline will block the merge process, ensuring that only reliable code is integrated into the main branch. Finally, the pipeline requiress a pytest coverage over a given threshold.
 2. **Deployment**: #TODO: under development!!!
 
 ## Deployment implementation
