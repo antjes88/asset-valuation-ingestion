@@ -23,10 +23,10 @@ jobs:
       SA_JSON: ${{ secrets.SA_JSON }}
       SOURCE_BUCKET: ${{ secrets.SOURCE_BUCKET }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -45,8 +45,12 @@ jobs:
           python -m pytest --junitxml=pytest.xml --cov-report "xml:coverage.xml" --cov=src tests/
 
       - name: Post comment
-        uses: Mishakav/pytest-coverage-comment@v1.1.53
+        uses: Mishakav/pytest-coverage-comment@81882822c5b22af01f91bd3eacb1cefb6ad73dc2 # v1.1.53
         with:
           pytest-xml-coverage-path: coverage.xml
           junitxml-path: ./pytest.xml
           coverage-path-prefix: src/
+
+      - name: Check Pytest coverage threshold >=95%
+        run: |
+          python -m pytest --cov=src --cov-fail-under=95
