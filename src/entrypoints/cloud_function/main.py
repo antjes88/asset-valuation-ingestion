@@ -5,7 +5,7 @@ from src.utils.gcp_clients import create_bigquery_client, create_storage_client
 logger = default_module_logger(__file__)
 
 
-def function_entry_point(event, context):
+def func_entry_point(event, context):
     """
     Entry point function for ingesting ECB exchange rates into raw layer of the DW in BigQuery.
     This function initializes a BigQueryRepository and an EcbApiCaller, then calls a service to fetch and load ECB
