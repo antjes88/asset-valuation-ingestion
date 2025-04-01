@@ -1,0 +1,33 @@
+name: terraform-validate
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Package src code for cloud function
+        run: |
+          mkdir -p ${{ RUNNER_TEMP }}/cloud_function
+          mkdir -p ${{ RUNNER_TEMP }}/cloud_function/src
+
+          cp -r ./src/entrypoints/cloud_function/main.py ${{ RUNNER_TEMP }}/cloud_function/
+          cp -r ./src/* ${{ RUNNER_TEMP }}/cloud_function/src/
+          cp -r ./requirements.txt ${{ RUNNER_TEMP }}/cloud_function/
+
+          rm -rf ${{ RUNNER_TEMP }}/cloud_function/src/entrypoints
+          rm -rf ${{ RUNNER_TEMP }}/cloud_function/src/__pycache__
+
+          echo "Packaging src code for cloud function..."
+          find "${{ RUNNER_TEMP }}/cloud_function" -type f
