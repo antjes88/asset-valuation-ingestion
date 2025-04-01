@@ -3,9 +3,14 @@ from google.cloud.storage.bucket import Bucket
 import pytest
 import os
 from typing import Tuple, List, Generator, Optional
+import warnings
 
 from src import destination_repository, model
 from tests.data.asset_valuations import ASSET_VALUATIONS_2018
+from src.utils.gcp_clients import create_bigquery_client, create_storage_client
+
+
+warnings.filterwarnings("ignore", category=UserWarning)
 
 
 @pytest.fixture(scope="session")
@@ -18,7 +23,7 @@ def bq_repository() -> destination_repository.BiqQueryDestinationRepository:
         instance of BiqQueryRepository()
     """
     bq_repository = destination_repository.BiqQueryDestinationRepository(
-        project=os.environ["PROJECT"]
+        bigquery_client=create_bigquery_client(os.environ.get("PROJECT"))
     )
     bq_repository.asset_valuations_destination = (
         os.environ["DATASET"] + "." + os.environ["DESTINATION_TABLE"]
@@ -50,7 +55,7 @@ def repository_with_asset_valuations(
 
     yield bq_repository, ASSET_VALUATIONS_2018
 
-    bq_repository.client.delete_table(
+    bq_repository.bigquery_client.delete_table(
         os.environ["DATASET"] + "." + os.environ["DESTINATION_TABLE"]
     )
 

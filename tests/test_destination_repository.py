@@ -16,7 +16,7 @@ def test_load_asset_valuations_from_zero(
     THEN Asset Valuations should be loaded into the destination table in the data repository
     """
     bq_repository, asset_valuations = repository_with_asset_valuations
-    query_job = bq_repository.client.query(
+    query_job = bq_repository.bigquery_client.query(
         f"SELECT * FROM {os.environ['DATASET']}.{os.environ['DESTINATION_TABLE']}"
     )
     rows = query_job.result()
@@ -58,7 +58,7 @@ def test_load_asset_valuations_appending(
     bq_repository.load_asset_valuations(assets_to_append)
 
     # get Asset Valuations from bigquery
-    query_job = bq_repository.client.query(
+    query_job = bq_repository.bigquery_client.query(
         f"SELECT * FROM {os.environ['DATASET']}.{os.environ['DESTINATION_TABLE']}"
     )
     rows = query_job.result()

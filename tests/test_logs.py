@@ -1,4 +1,4 @@
-from src.logs import default_module_logger
+from src.utils.logs import default_module_logger
 import logging
 
 

@@ -19,7 +19,7 @@ def test_asset_valuation_pipeline_generic(
     bq_repository, asset_valuations_pre = repository_with_asset_valuations
     services.asset_valuation_pipeline(file, bq_repository)
 
-    query_job = bq_repository.client.query(
+    query_job = bq_repository.bigquery_client.query(
         f"SELECT * FROM {os.environ['DATASET']}.{os.environ['DESTINATION_TABLE']}"
     )
     rows = query_job.result()
@@ -55,7 +55,7 @@ def test_asset_valuation_pipeline_hl(
     bq_repository, asset_valuations_pre = repository_with_asset_valuations
     services.asset_valuation_pipeline(file, bq_repository)
 
-    query_job = bq_repository.client.query(
+    query_job = bq_repository.bigquery_client.query(
         f"SELECT * FROM {os.environ['DATASET']}.{os.environ['DESTINATION_TABLE']}"
     )
     rows = query_job.result()
