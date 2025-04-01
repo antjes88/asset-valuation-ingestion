@@ -35,17 +35,17 @@ class BiqQueryDestinationRepository(AbstractDestinationRepository):
     This repository class is designed to load asset valuations data into Google BigQuery.
 
     Args:
-        project (str, optional): The Google Cloud project ID. Defaults to None.
+        bigquery_client (google.cloud.bigquery.Client): BigQuery client instance.
     Attributes:
-        client (google.cloud.bigquery.Client): The BigQuery client instance.
+        bigquery_client (google.cloud.bigquery.Client): BigQuery client instance.
         asset_valuations_destination (str): The destination table for asset valuations in BigQuery.
     Methods:
         load_asset_valuations(asset_valuations: list[model.AssetValuation]):
             Load asset valuations into BigQuery table indicated by attribute asset_valuations_destination.
     """
 
-    def __init__(self, project: Optional[str] = None):
-        self.client = bigquery.Client(project=project)
+    def __init__(self, bigquery_client: bigquery.Client):
+        self.bigquery_client = bigquery_client
         self.asset_valuations_destination = "raw.asset_valuations_v2"
 
     def load_asset_valuations(self, asset_valuations: list[model.AssetValuation]):
@@ -74,7 +74,7 @@ class BiqQueryDestinationRepository(AbstractDestinationRepository):
             write_disposition=bigquery.WriteDisposition.WRITE_APPEND,
             source_format=bigquery.SourceFormat.NEWLINE_DELIMITED_JSON,
         )
-        load_job = self.client.load_table_from_json(
+        load_job = self.bigquery_client.load_table_from_json(
             dictify, self.asset_valuations_destination, job_config=job_config
         )
         load_job.result()

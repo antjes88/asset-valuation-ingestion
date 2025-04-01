@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from google.cloud import storage
-from google.cloud.storage import Blob, Bucket
+from google.cloud.storage import Bucket
 import csv
 import datetime as dt
 from typing import IO, Any, List, Optional
 
 from src import model, custom_errors
+from src.utils.gcp_clients import create_bigquery_client, create_storage_client
 
 
 class AbstractSourceRepository(ABC):
@@ -238,12 +239,12 @@ class GcpBucketFileSource(FileSourceAbstract):
     Args:
         file_path (str): The path to the file in the GCP bucket.
         bucket_name (str): The name of the GCP bucket.
-        project_name (str, optional): The name of the GCP project. Defaults to None.
+        storage_client (storage.Client): A client for interacting with Google Cloud Storage.
     Attributes:
         file_path (str): The path to the local file.
         file_format (str): The format of the file, extracted from the file extension.
         file_type (str): The type of the file, derived from the file name.
-        project_name (str, optional): The name of the GCP project. Defaults to None.
+        storage_client (storage.Client): A client for interacting with Google Cloud Storage.
         bucket (Bucket): The GCP Bucket client.
     Methods:
         _open():
@@ -258,10 +259,10 @@ class GcpBucketFileSource(FileSourceAbstract):
     """
 
     def __init__(
-        self, file_path: str, bucket_name: str, project_name: Optional[str] = None
+        self, file_path: str, bucket_name: str, storage_client: storage.Client
     ):
         super().__init__(file_path)
-        self.project_name = project_name
+        self.storage_client = storage_client
         self.bucket: Bucket = self._get_bucket(bucket_name)
 
     def _get_bucket(self, bucket_name: str) -> Bucket:
@@ -273,8 +274,7 @@ class GcpBucketFileSource(FileSourceAbstract):
         Returns:
             storage.bucket.Bucket: The GCP bucket.
         """
-        storage_client = storage.Client(self.project_name)
-        bucket: Bucket = storage_client.bucket(bucket_name)
+        bucket: Bucket = self.storage_client.bucket(bucket_name)
 
         return bucket
 

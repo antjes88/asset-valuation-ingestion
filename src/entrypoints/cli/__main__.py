@@ -4,7 +4,7 @@ from src.entrypoints.cli.load_file import (
     load_local_file,
     load_all_files_from_bucket,
 )
-from src.entrypoints.cli.utils import env_var_loader
+from src.utils.env_var_loader import env_var_loader
 import warnings
 
 

@@ -1,9 +1,6 @@
 import os
-from src.entrypoints.cli.utils import env_var_loader
-import warnings
+from src.utils.env_var_loader import env_var_loader
 
-
-warnings.filterwarnings("ignore", category=UserWarning)
 
 env_var_loader("tests/.env")
 

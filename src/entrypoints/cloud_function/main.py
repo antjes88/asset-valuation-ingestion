@@ -1,10 +1,11 @@
 from src import source_repository, destination_repository, services
-from src.logs import default_module_logger
+from src.utils.logs import default_module_logger
+from src.utils.gcp_clients import create_bigquery_client, create_storage_client
 
 logger = default_module_logger(__file__)
 
 
-def function_entry_point(event, context):
+def func_entry_point(event, context):
     """
     Entry point function for ingesting ECB exchange rates into raw layer of the DW in BigQuery.
     This function initializes a BigQueryRepository and an EcbApiCaller, then calls a service to fetch and load ECB
@@ -26,7 +27,11 @@ def function_entry_point(event, context):
     bucket_name = event["bucket"]
     file_path = event["name"]
     logger.info(f"Working on file: '{file_path}' found on Bucket: '{bucket_name}'")
-    file = source_repository.GcpBucketFileSource(file_path, bucket_name)
-    bigquery = destination_repository.BiqQueryDestinationRepository()
+    file = source_repository.GcpBucketFileSource(
+        file_path, bucket_name, create_storage_client()
+    )
+    bigquery = destination_repository.BiqQueryDestinationRepository(
+        bigquery_client=create_bigquery_client()
+    )
 
     services.asset_valuation_pipeline(file, bigquery)
