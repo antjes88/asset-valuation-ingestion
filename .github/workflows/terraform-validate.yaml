@@ -19,15 +19,15 @@ jobs:
 
       - name: Package src code for cloud function
         run: |
-          mkdir -p ${{ RUNNER_TEMP }}/cloud_function
-          mkdir -p ${{ RUNNER_TEMP }}/cloud_function/src
+          mkdir -p $RUNNER_TEMP/cloud_function
+          mkdir -p $RUNNER_TEMP/cloud_function/src
 
-          cp -r ./src/entrypoints/cloud_function/main.py ${{ RUNNER_TEMP }}/cloud_function/
-          cp -r ./src/* ${{ RUNNER_TEMP }}/cloud_function/src/
-          cp -r ./requirements.txt ${{ RUNNER_TEMP }}/cloud_function/
+          cp -r ./src/entrypoints/cloud_function/main.py $RUNNER_TEMP/cloud_function/
+          cp -r ./src/* $RUNNER_TEMP/cloud_function/src/
+          cp -r ./requirements.txt $RUNNER_TEMP/cloud_function/
 
-          rm -rf ${{ RUNNER_TEMP }}/cloud_function/src/entrypoints
-          rm -rf ${{ RUNNER_TEMP }}/cloud_function/src/__pycache__
+          rm -rf $RUNNER_TEMP/cloud_function/src/entrypoints
+          rm -rf $RUNNER_TEMP/cloud_function/src/__pycache__
 
           echo "Packaging src code for cloud function..."
-          find "${{ RUNNER_TEMP }}/cloud_function" -type f
+          find "$RUNNER_TEMP/cloud_function" -type f
