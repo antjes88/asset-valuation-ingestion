@@ -165,3 +165,5 @@ kindergarden.py
 .devcontainer/git_config.sh
 temp-cloud-function-*/
 zip_to_cloud_function.zip
+./temp
+./tmp
