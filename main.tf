@@ -26,54 +26,16 @@ locals {
   bucket_object_file_path = "${var.cloud_function_name}/source-code-${replace(time_static.build_time.rfc3339, "/[-:TZ]/", "")}.zip"
 }
 
-# temp folder to reorganize the source code to be used in the cloud function
-resource "null_resource" "temp_folder" {
-  provisioner "local-exec" {
-    command = <<EOT
-      mkdir -p ./${local.temp_folder_name}
-      mkdir -p ./${local.temp_folder_name}/src
-      
-      cp -r ./src/entrypoints/cloud_function/main.py ./${local.temp_folder_name}/
-      cp -r ./src/* ./${local.temp_folder_name}/src/
-      cp -r ./requirements.txt ./${local.temp_folder_name}/
-      
-      rm -rf ./${local.temp_folder_name}/src/entrypoints
-      rm -rf ./${local.temp_folder_name}/src/__pycache__
-    EOT
-  }
-  triggers = {
-    always_run = timestamp() # Forces execution every time
-  }
-}
 
 # zip the source code and upload it to the bucket
 data "google_storage_bucket" "source_code" {
   name = "source-code-cloud-functions-cyd2y7j6"
 }
 
-data "archive_file" "source_code" {
-  type        = "zip"
-  source_dir  = "./${local.temp_folder_name}"
-  output_path = local.zip_file_local_path
-  depends_on  = [null_resource.temp_folder]
-}
-
 resource "google_storage_bucket_object" "zip_file" {
-  name       = local.bucket_object_file_path
-  bucket     = data.google_storage_bucket.source_code.name
-  source     = data.archive_file.source_code.output_path
-  depends_on = [data.archive_file.source_code]
-}
-
-# Cleansing the temporary folder and the zip file
-resource "null_resource" "temp_folder_cleansing" {
-  provisioner "local-exec" {
-    command = <<EOT
-      rm -rf ./${local.temp_folder_name}
-      rm -rf ${local.zip_file_local_path}
-    EOT
-  }
-  depends_on = [google_storage_bucket_object.zip_file]
+  name   = local.bucket_object_file_path
+  bucket = data.google_storage_bucket.source_code.name
+  source = var.zip_file_path
 }
 
 # Creation of triggering bucket

@@ -19,8 +19,10 @@
                 "ms-azuretools.vscode-docker",
                 "gruntfuggly.todo-tree",
                 "redhat.vscode-yaml",
+                "meezilla.json",
                 "mechatroner.rainbow-csv",
-                "hashicorp.terraform"
+                "hashicorp.terraform",
+                "github.vscode-github-actions"
             ]
         }
     }
