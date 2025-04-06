@@ -100,17 +100,28 @@ There are 2 CI/CD pipelines implemented as GitHub Actions:
 2. **Deployment**: #TODO: under development!!!
 
 ## Deployment implementation
-
+# TODO: under development, this all has to change
 The Terraform code in this repository automates the deployment of the Asset Valuation ingestion solution on Google Cloud Platform (GCP). It provisions and configures the necessary resources to ensure seamless ingestion and processing of data. Key resources created include:
-
-1. **Google Cloud Storage Bucket**: A bucket is created to store the CSV files that trigger the ingestion process. This bucket is configured with event notifications to invoke the Cloud Function upon file upload.
 
 2. **Google Cloud Function**: The Cloud Function is deployed to process the uploaded files. It serves as the entry point for the ingestion pipeline, parsing the data and loading it into BigQuery. _Note that for every deployment, the Cloud Function entrypoint name must be updated in the Terraform configuration to ensure a correct update_.
 
-3. **IAM Roles and Permissions**: A Cloud Function Service Account is created and roles granted. The default Cloud Storage service account must be granted the `roles/pubsub.publisher` role to enable event notifications. Ensure this role is assigned before deployment.
+### Considerations
 
-4. **Null Resources**: Null resources are utilized during the deployment process to execute custom scripts. These scripts ensure that the necessary code files are properly captured and packaged for deployment.
+The Terraform code is designed to be executed by the workflows defined in `.github/workflows/terraform-validate.yaml` and `.github/workflows/terraform-apply.yaml`. These workflows first package the source code into a zip file, which is then used as the source code for the Cloud Function during the Terraform execution.
 
-### Requisites
+If you prefer to execute the Terraform code locally, you must first run the `.github/package_cfsrc.sh`* bash script. This script packages the source code into a zip file. Once the zip file is created, you can proceed with running `terraform plan` or `terraform apply`, providing the name of the zip file.
 
-Ensure that your default cloud storage service account is assigned the roles/pubsub.publisher role.
+**This file must be executed at repo root folder.*
+
+### Requirements
+
+Before the terraform code can be executed the next is needed:
+- Ensure that your default cloud storage service account is assigned the _roles/pubsub.publisher_ role.
+- Provide a Service Account that 
+- Grant next permissions ..... to either your own user account or to a service account so it can execute the operations in GCP descirbe by the terraform code.
+
+If you pretend to reuse the github action you need to:
+- Create a Workload identity provider. [Why?](https://cloud.google.com/blog/products/identity-security/enabling-keyless-authentication-from-github-actions) [Instructions](https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-google-cloud-platform)
+- Provide a Service Account with next roles
+    - _roles/storage.admin_
+    - _roles/storage.objectAdmin_
