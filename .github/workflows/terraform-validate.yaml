@@ -22,10 +22,13 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
+      - name: Set ZIP_FILE_PATH environment variable
+        run: echo "ZIP_FILE_PATH=$RUNNER_TEMP/cloud_function_${{ github.run_number }}.zip" >> $GITHUB_ENV
+
       - name: Package src code for cloud function
         run: |
           chmod +x ./.github/package_cfsrc.sh
-          ./.github/package_cfsrc.sh $RUNNER_TEMP $RUNNER_TEMP/cloud_function_${{ github.run_number }}.zip
+          ./.github/package_cfsrc.sh $RUNNER_TEMP $ZIP_FILE_PATH
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
@@ -51,4 +54,4 @@ jobs:
           terraform validate
 
           echo "Running Terraform plan..."
-          terraform plan -input=false -var="zip_file_path=$RUNNER_TEMP/cloud_function_${{ github.run_number }}.zip"
+          terraform plan -input=false -var="zip_file_path=$ZIP_FILE_PATH"
