@@ -24,10 +24,17 @@ jobs:
       PROJECT: ${{ secrets.PROJECT }}
       DESTINATION_TABLE: ${{ secrets.DESTINATION_TABLE }}
       DATASET: ${{ secrets.DATASET }}
-      SA_JSON: ${{ secrets.SA_JSON }}
+      # SA_JSON: ${{ secrets.SA_JSON }}
       SOURCE_BUCKET: ${{ secrets.SOURCE_BUCKET }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Fetch GCP Key
+        uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2.1.7
+        with:
+          create_credentials_file: true
+          workload_identity_provider: '${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}'
+          service_account: '${{ secrets.SERVICE_ACCOUNT_PYTEST_EMAIL }}'
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5
