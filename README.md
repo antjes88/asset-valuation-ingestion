@@ -61,13 +61,13 @@ DESTINATION_TABLE={name of destination table in BQ}
 DATASET={name of destination dataset in BQ}
 ```
 
-execute the following command in terminal to ensur:
+execute the following command in terminal to ensure:
 
 ```bash
 python -m pytest -vv --cov --cov-report=html
 ```
 
-Unit testing has been integrated into the CI/CD pipeline. A merge will not be approved unless all tests pass successfully. Additionally, a coverage report is automatically generated and provided as a comment for reference.
+Unit testing has been integrated into the CI/CD pipeline. A merge will not be approved unless all tests pass successfully. Additionally, a coverage report is automatically generated and provided as a comment for reference. A Service Account granted with role `roles/bigquery.jobUser` is required. Current workflow, `.github/workflows/pytest.yaml`, is set to access GCP Project through Workload Identity Provider.
 
 ## Component Diagram
 
@@ -96,7 +96,8 @@ In the picture above you can also find the Domain Model diagram representing the
 ## CI/CD - Pipeline Integration
 There are 2 CI/CD pipelines implemented as GitHub Actions:
 
-1. **Pytest**: This pipeline is defined in the `.github/workflows/pytest.yaml` file. It is triggered on every pull request, what runs unit tests using `pytest`. It also generates a test coverage report to ensure code quality. If any test fails, the pipeline will block the merge process, ensuring that only reliable code is integrated into the main branch. Finally, the pipeline requiress a pytest coverage over a given threshold.
+1. **Pytest**: This pipeline is defined in the `.github/workflows/pytest.yaml` file. It is triggered on every pull request, what runs unit tests using `pytest`. It also generates a test coverage report to ensure code quality. If any test fails, the pipeline will block the merge process, ensuring that only reliable code is integrated into the main branch. Finally, the pipeline requiress a pytest coverage over a given threshold. A Service Account granted with role `roles/bigquery.jobUser` is required. Current workflow, `.github/workflows/pytest.yaml`, is set to access GCP Project through Workload Identity Provider.
+
 2. **Deployment**: The deployment process is managed through two GitHub Actions workflows. The first workflow, `.github/workflows/terraform-validate.yaml`, validates the Terraform code and generates a deployment plan during a pull request, blocking merge in case of failures. The second workflow, `.github/workflows/terraform-apply.yaml`, executes after a merge to deploy the changes to Google Cloud Platform (GCP).
 
 ## Deployment implementation
@@ -120,23 +121,23 @@ A final consideration is that the backend for this solution is configured to res
 Before the Terraform code can be executed, ensure the following:
 
 1. **Default Cloud Storage Service Account**:
-    - Assign the `_roles/pubsub.publisher_` role to your Default Cloud Storage Service Account.
+    - Assign the `roles/pubsub.publisher` role to your Default Cloud Storage Service Account.
 
 2. **Cloud Function Service Account**:
     - Provide a Service Account for the Cloud Function with the following roles:
-      - `_roles/bigquery.dataEditor_`
-      - `_roles/bigquery.jobUser_`
-      - `_roles/run.invoker_`
-      - `_roles/eventarc.eventReceiver_`
-      - `_roles/storage.objectViewer_` on the _raw assets_ bucket.
+      - `roles/bigquery.dataEditor`
+      - `roles/bigquery.jobUser`
+      - `roles/run.invoker`
+      - `roles/eventarc.eventReceiver`
+      - `roles/storage.objectViewer` on the _raw assets_ bucket.
 
 3. **Terraform Execution Permissions**:
     - Either your user account or the Service Account used to run the Terraform code must have the following roles:
-      - `_roles/iam.serviceAccountUser_` on the Service Account mentioned in the previous point.
-      - `_roles/eventarc.admin_`
-      - `_roles/cloudfunctions.admin_`
-      - `_roles/storage.objectAdmin_` on the _raw assets_, _source code_, and _backend_ buckets.
-      - `_roles/storage.insightsCollectorService_`
+      - `roles/iam.serviceAccountUser` on the Service Account mentioned in the previous point.
+      - `roles/eventarc.admin`
+      - `roles/cloudfunctions.admin`
+      - `roles/storage.objectAdmin` on the _raw assets_, _source code_, and _backend_ buckets.
+      - `roles/storage.insightsCollectorService`
 
 To reuse the GitHub Action, follow these steps:
 
@@ -149,3 +150,6 @@ To reuse the GitHub Action, follow these steps:
    - Grant the Terraform Executor Service Account the necessary permissions to execute Terraform code as indicated before.
    - Assign the role `roles/iam.workloadIdentityUser`.
    - Set the Service Account as the principal for the Workload Identity Provider created in step 1.
+
+3. **Provide secrets:**
+    - `WORKLOAD_IDENTITY_PROVIDER` & `SERVICE_ACCOUNT_EMAIL` must be provided as Github Actions Secrets.

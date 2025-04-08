@@ -25,7 +25,6 @@ jobs:
       PROJECT: ${{ secrets.PROJECT }}
       DESTINATION_TABLE: ${{ secrets.DESTINATION_TABLE }}
       DATASET: ${{ secrets.DATASET }}
-      # SA_JSON: ${{ secrets.SA_JSON }}
       SOURCE_BUCKET: ${{ secrets.SOURCE_BUCKET }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
