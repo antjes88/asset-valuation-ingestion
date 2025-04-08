@@ -12,7 +12,7 @@ The solution is deployed using Terraform as a Google Cloud Function. This functi
 
 - **Development Environment**: Pre-configured development container for consistent setup.
 - **Comprehensive Testing**: Includes unit tests and integration tests to ensure code reliability, along with test coverage reporting.
-- **Pipeline Integration**: Automated pipelines to unit test python solution and deployment.
+- **Pipeline Integration**: Automated pipelines to unit test python solution and deployment to GCP.
 
 
 ## Development environment
@@ -97,13 +97,13 @@ In the picture above you can also find the Domain Model diagram representing the
 There are 2 CI/CD pipelines implemented as GitHub Actions:
 
 1. **Pytest**: This pipeline is defined in the `.github/workflows/pytest.yaml` file. It is triggered on every pull request, what runs unit tests using `pytest`. It also generates a test coverage report to ensure code quality. If any test fails, the pipeline will block the merge process, ensuring that only reliable code is integrated into the main branch. Finally, the pipeline requiress a pytest coverage over a given threshold.
-2. **Deployment**: #TODO: under development!!!
+2. **Deployment**: The deployment process is managed through two GitHub Actions workflows. The first workflow, `.github/workflows/terraform-validate.yaml`, validates the Terraform code and generates a deployment plan during a pull request, blocking merge in case of failures. The second workflow, `.github/workflows/terraform-apply.yaml`, executes after a merge to deploy the changes to Google Cloud Platform (GCP).
 
 ## Deployment implementation
-# TODO: under development, this all has to change
-The Terraform code in this repository automates the deployment of the Asset Valuation ingestion solution on Google Cloud Platform (GCP). It provisions and configures the necessary resources to ensure seamless ingestion and processing of data. Key resources created include:
 
-2. **Google Cloud Function**: The Cloud Function is deployed to process the uploaded files. It serves as the entry point for the ingestion pipeline, parsing the data and loading it into BigQuery. _Note that for every deployment, the Cloud Function entrypoint name must be updated in the Terraform configuration to ensure a correct update_.
+The Terraform code in this repository automates the deployment of the Asset Valuation ingestion solution on Google Cloud Platform (GCP). It provisions and configures the necessary resources to ensure seamless ingestion and processing of data. 
+
+Terraform code handles uploading the source code zip file to the designated Cloud Function Source Code bucket and creating the Cloud Function itself.
 
 ### Considerations
 
@@ -111,17 +111,41 @@ The Terraform code is designed to be executed by the workflows defined in `.gith
 
 If you prefer to execute the Terraform code locally, you must first run the `.github/package_cfsrc.sh`* bash script. This script packages the source code into a zip file. Once the zip file is created, you can proceed with running `terraform plan` or `terraform apply`, providing the name of the zip file.
 
+A final consideration is that the backend for this solution is configured to reside in Google Cloud Storage (GCS). If you plan to reuse this code, ensure you update the backend bucket name accordingly.
+
 **This file must be executed at repo root folder.*
 
-### Requirements
+### Prerequisites for Terraform Execution
 
-Before the terraform code can be executed the next is needed:
-- Ensure that your default cloud storage service account is assigned the _roles/pubsub.publisher_ role.
-- Provide a Service Account that 
-- Grant next permissions ..... to either your own user account or to a service account so it can execute the operations in GCP descirbe by the terraform code.
+Before the Terraform code can be executed, ensure the following:
 
-If you pretend to reuse the github action you need to:
-- Create a Workload identity provider. [Why?](https://cloud.google.com/blog/products/identity-security/enabling-keyless-authentication-from-github-actions) [Instructions](https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-google-cloud-platform)
-- Provide a Service Account with next roles
-    - _roles/storage.admin_
-    - _roles/storage.objectAdmin_
+1. **Default Cloud Storage Service Account**:
+    - Assign the `_roles/pubsub.publisher_` role to your Default Cloud Storage Service Account.
+
+2. **Cloud Function Service Account**:
+    - Provide a Service Account for the Cloud Function with the following roles:
+      - `_roles/bigquery.dataEditor_`
+      - `_roles/bigquery.jobUser_`
+      - `_roles/run.invoker_`
+      - `_roles/eventarc.eventReceiver_`
+      - `_roles/storage.objectViewer_` on the _raw assets_ bucket.
+
+3. **Terraform Execution Permissions**:
+    - Either your user account or the Service Account used to run the Terraform code must have the following roles:
+      - `_roles/iam.serviceAccountUser_` on the Service Account mentioned in the previous point.
+      - `_roles/eventarc.admin_`
+      - `_roles/cloudfunctions.admin_`
+      - `_roles/storage.objectAdmin_` on the _raw assets_, _source code_, and _backend_ buckets.
+      - `_roles/storage.insightsCollectorService_`
+
+To reuse the GitHub Action, follow these steps:
+
+1. **Create a Workload Identity Provider (WIP):**  
+   This enables keyless authentication for GitHub Actions.  
+   - [Learn why this is needed](https://cloud.google.com/blog/products/identity-security/enabling-keyless-authentication-from-github-actions).  
+   - [Follow these instructions](https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-google-cloud-platform).
+
+2. **Set up Service Account:**  
+   - Grant the Terraform Executor Service Account the necessary permissions to execute Terraform code as indicated before.
+   - Assign the role `roles/iam.workloadIdentityUser`.
+   - Set the Service Account as the principal for the Workload Identity Provider created in step 1.
