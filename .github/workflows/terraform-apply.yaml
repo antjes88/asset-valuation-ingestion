@@ -55,4 +55,4 @@ jobs:
           terraform validate
 
           echo "Running Terraform plan..."
-          terraform apply -input=false -var="zip_file_path=$ZIP_FILE_PATH"
+          terraform apply -input=false -auto-approve -var="zip_file_path=$ZIP_FILE_PATH"
