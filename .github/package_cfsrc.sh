@@ -24,15 +24,8 @@ rm -rf "$RUNNER_TEMP/cloud_function/src/__pycache__"
 echo "Packaging src code for cloud function..."
 find "$RUNNER_TEMP/cloud_function" -type f
 
-
 cd "$RUNNER_TEMP/cloud_function"
-
-if [ "$ISDEVCONTAINER" == "true" ]; then
-    zip -r "../../$OUTPUT_FILE_PATH" .
-else
-    zip -r "../..$OUTPUT_FILE_PATH" .
-fi
-
+zip -r "$OUTPUT_FILE_PATH" .
 cd ../..
 
 echo "Cloud function code packaged successfully at $OUTPUT_FILE_PATH"
