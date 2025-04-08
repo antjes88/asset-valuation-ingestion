@@ -12,7 +12,7 @@ The solution is deployed using Terraform as a Google Cloud Function. This functi
 
 - **Development Environment**: Pre-configured development container for consistent setup.
 - **Comprehensive Testing**: Includes unit tests and integration tests to ensure code reliability, along with test coverage reporting.
-- **Pipeline Integration**: Automated pipelines to unit test python solution and deployment.
+- **Pipeline Integration**: Automated pipelines to unit test python solution and deployment to GCP.
 
 
 ## Development environment
@@ -61,13 +61,13 @@ DESTINATION_TABLE={name of destination table in BQ}
 DATASET={name of destination dataset in BQ}
 ```
 
-execute the following command in terminal to ensur:
+execute the following command in terminal to ensure:
 
 ```bash
 python -m pytest -vv --cov --cov-report=html
 ```
 
-Unit testing has been integrated into the CI/CD pipeline. A merge will not be approved unless all tests pass successfully. Additionally, a coverage report is automatically generated and provided as a comment for reference.
+Unit testing has been integrated into the CI/CD pipeline. A merge will not be approved unless all tests pass successfully. Additionally, a coverage report is automatically generated and provided as a comment for reference. A Service Account granted with role `roles/bigquery.jobUser` is required. Current workflow, `.github/workflows/pytest.yaml`, is set to access GCP Project through Workload Identity Provider.
 
 ## Component Diagram
 
@@ -96,21 +96,60 @@ In the picture above you can also find the Domain Model diagram representing the
 ## CI/CD - Pipeline Integration
 There are 2 CI/CD pipelines implemented as GitHub Actions:
 
-1. **Pytest**: This pipeline is defined in the `.github/workflows/pytest.yaml` file. It is triggered on every pull request, what runs unit tests using `pytest`. It also generates a test coverage report to ensure code quality. If any test fails, the pipeline will block the merge process, ensuring that only reliable code is integrated into the main branch. Finally, the pipeline requiress a pytest coverage over a given threshold.
-2. **Deployment**: #TODO: under development!!!
+1. **Pytest**: This pipeline is defined in the `.github/workflows/pytest.yaml` file. It is triggered on every pull request, what runs unit tests using `pytest`. It also generates a test coverage report to ensure code quality. If any test fails, the pipeline will block the merge process, ensuring that only reliable code is integrated into the main branch. Finally, the pipeline requiress a pytest coverage over a given threshold. A Service Account granted with role `roles/bigquery.jobUser` is required. Current workflow, `.github/workflows/pytest.yaml`, is set to access GCP Project through Workload Identity Provider.
+
+2. **Deployment**: The deployment process is managed through two GitHub Actions workflows. The first workflow, `.github/workflows/terraform-validate.yaml`, validates the Terraform code and generates a deployment plan during a pull request, blocking merge in case of failures. The second workflow, `.github/workflows/terraform-apply.yaml`, executes after a merge to deploy the changes to Google Cloud Platform (GCP).
 
 ## Deployment implementation
 
-The Terraform code in this repository automates the deployment of the Asset Valuation ingestion solution on Google Cloud Platform (GCP). It provisions and configures the necessary resources to ensure seamless ingestion and processing of data. Key resources created include:
+The Terraform code in this repository automates the deployment of the Asset Valuation ingestion solution on Google Cloud Platform (GCP). It provisions and configures the necessary resources to ensure seamless ingestion and processing of data. 
 
-1. **Google Cloud Storage Bucket**: A bucket is created to store the CSV files that trigger the ingestion process. This bucket is configured with event notifications to invoke the Cloud Function upon file upload.
+Terraform code handles uploading the source code zip file to the designated Cloud Function Source Code bucket and creating the Cloud Function itself.
 
-2. **Google Cloud Function**: The Cloud Function is deployed to process the uploaded files. It serves as the entry point for the ingestion pipeline, parsing the data and loading it into BigQuery. _Note that for every deployment, the Cloud Function entrypoint name must be updated in the Terraform configuration to ensure a correct update_.
+### Considerations
 
-3. **IAM Roles and Permissions**: A Cloud Function Service Account is created and roles granted. The default Cloud Storage service account must be granted the `roles/pubsub.publisher` role to enable event notifications. Ensure this role is assigned before deployment.
+The Terraform code is designed to be executed by the workflows defined in `.github/workflows/terraform-validate.yaml` and `.github/workflows/terraform-apply.yaml`. These workflows first package the source code into a zip file, which is then used as the source code for the Cloud Function during the Terraform execution.
 
-4. **Null Resources**: Null resources are utilized during the deployment process to execute custom scripts. These scripts ensure that the necessary code files are properly captured and packaged for deployment.
+If you prefer to execute the Terraform code locally, you must first run the `.github/package_cfsrc.sh`* bash script. This script packages the source code into a zip file. Once the zip file is created, you can proceed with running `terraform plan` or `terraform apply`, providing the name of the zip file.
 
-### Requisites
+A final consideration is that the backend for this solution is configured to reside in Google Cloud Storage (GCS). If you plan to reuse this code, ensure you update the backend bucket name accordingly.
 
-Ensure that your default cloud storage service account is assigned the roles/pubsub.publisher role.
+**This file must be executed at repo root folder.*
+
+### Prerequisites for Terraform Execution
+
+Before the Terraform code can be executed, ensure the following:
+
+1. **Default Cloud Storage Service Account**:
+    - Assign the `roles/pubsub.publisher` role to your Default Cloud Storage Service Account.
+
+2. **Cloud Function Service Account**:
+    - Provide a Service Account for the Cloud Function with the following roles:
+      - `roles/bigquery.dataEditor`
+      - `roles/bigquery.jobUser`
+      - `roles/run.invoker`
+      - `roles/eventarc.eventReceiver`
+      - `roles/storage.objectViewer` on the _raw assets_ bucket.
+
+3. **Terraform Execution Permissions**:
+    - Either your user account or the Service Account used to run the Terraform code must have the following roles:
+      - `roles/iam.serviceAccountUser` on the Service Account mentioned in the previous point.
+      - `roles/eventarc.admin`
+      - `roles/cloudfunctions.admin`
+      - `roles/storage.objectAdmin` on the _raw assets_, _source code_, and _backend_ buckets.
+      - `roles/storage.insightsCollectorService`
+
+To reuse the GitHub Action, follow these steps:
+
+1. **Create a Workload Identity Provider (WIP):**  
+   This enables keyless authentication for GitHub Actions.  
+   - [Learn why this is needed](https://cloud.google.com/blog/products/identity-security/enabling-keyless-authentication-from-github-actions).  
+   - [Follow these instructions](https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-google-cloud-platform).
+
+2. **Set up Service Account:**  
+   - Grant the Terraform Executor Service Account the necessary permissions to execute Terraform code as indicated before.
+   - Assign the role `roles/iam.workloadIdentityUser`.
+   - Set the Service Account as the principal for the Workload Identity Provider created in step 1.
+
+3. **Provide secrets:**
+    - `WORKLOAD_IDENTITY_PROVIDER` & `SERVICE_ACCOUNT_EMAIL` must be provided as Github Actions Secrets.

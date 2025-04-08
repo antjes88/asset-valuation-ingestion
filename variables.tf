@@ -29,3 +29,8 @@ variable "function_entry_point" {
   type        = string
   description = "Name of the Cloud Function"
 }
+
+variable "zip_file_path" {
+  type        = string
+  description = "Name of zip file with the Cloud Function code"
+}
