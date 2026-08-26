@@ -1,4 +1,4 @@
-FROM python:3.10.16 AS base
+FROM python:3.12.14 AS base
 RUN apt update
 RUN apt upgrade -y
 

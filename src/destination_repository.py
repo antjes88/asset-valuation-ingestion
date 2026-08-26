@@ -1,61 +1,29 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List, Any, Dict
+from typing import List, Any, Dict
 from google.cloud import bigquery
 
 from src import model
 
 
 class AbstractDestinationRepository(ABC):
-    """
-    An abstract base class for repository interfaces that define methods
-    to load data into destination repositories.
-
-    Methods:
-        load_asset_valuations (List[model.AssetValuation]):
-            List of AssetValuation instances to be loaded into the repository.
-    """
 
     @abstractmethod
     def load_asset_valuations(
         self, asset_valuations: list[model.AssetValuation]
     ) -> None:
-        """
-        Abstract method to load Asset Valuations into the repository.
 
-        Args:
-            asset_valuations (List[model.AssetValuation]): List of AssetValuation instances
-                                                           to be loaded into the repository.
-        """
         raise NotImplementedError
 
 
 class BiqQueryDestinationRepository(AbstractDestinationRepository):
-    """
-    Concrete implementation of the AbstractDestinationRepository for interacting with Google BigQuery.
-    This repository class is designed to load asset valuations data into Google BigQuery.
-
-    Args:
-        bigquery_client (google.cloud.bigquery.Client): BigQuery client instance.
-    Attributes:
-        bigquery_client (google.cloud.bigquery.Client): BigQuery client instance.
-        asset_valuations_destination (str): The destination table for asset valuations in BigQuery.
-    Methods:
-        load_asset_valuations(asset_valuations: list[model.AssetValuation]):
-            Load asset valuations into BigQuery table indicated by attribute asset_valuations_destination.
-    """
 
     def __init__(self, bigquery_client: bigquery.Client):
         self.bigquery_client = bigquery_client
         self.asset_valuations_destination = "raw.asset_valuations_v2"
 
-    def load_asset_valuations(self, asset_valuations: list[model.AssetValuation]):
-        """
-        Load Asset Valuations into BigQuery table indicated by attribute asset_valuations_destination.
-
-        Args:
-            asset_valuations (List[model.AssetValuation]):
-                List of AssetValuation instances to be loaded into BigQuery.
-        """
+    def load_asset_valuations(
+        self, asset_valuations: list[model.AssetValuation]
+    ) -> None:
 
         dictify: List[Dict[str, Any]] = [
             {
