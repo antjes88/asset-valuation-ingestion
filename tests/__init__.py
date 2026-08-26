@@ -1,8 +1,8 @@
 import os
-from src.utils.env_var_loader import env_var_loader
+from dotenv import load_dotenv
 
+load_dotenv(dotenv_path="tests/.env", override=True)
 
-env_var_loader("tests/.env")
 
 # load sa if applicable
 if os.environ.get("SA_JSON"):
